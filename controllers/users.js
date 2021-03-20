@@ -1,4 +1,5 @@
 /* eslint-disable linebreak-style */
+const bcrypt = require('bcryptjs');
 const User = require('../models/user');
 
 // Получить список всех юзеров
@@ -23,8 +24,12 @@ const getUserProfile = (req, res) => User.findOne({ _id: req.params.id })
 
 // Создать юзера
 const createUser = (req, res) => {
-  const { name, about, avatar } = req.body;
-  User.create({ name, about, avatar })
+  const {
+    name, about, avatar, email, password,
+  } = req.body;
+  bcrypt.hash(password, 10).then((hash) => User.create({
+    name, about, avatar, email, password: hash,
+  }))
     .then((user) => res.status(200).send(user))
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
