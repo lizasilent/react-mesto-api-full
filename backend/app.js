@@ -1,17 +1,15 @@
 /* eslint-disable linebreak-style */
 const express = require('express');
 
-const app = express();
-const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const usersRouter = require('./routes/users');
 const cardsRouter = require('./routes/cards');
-const login = require('./routes/login');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
+const { createUser, login } = require('./controllers/users');
 const auth = require('./middlewares/auth');
-const createUser = require('./routes/createUser');
 
 const PORT = 3000;
+const app = express();
 
 mongoose.connect('mongodb://localhost:27017/mestodb', {
   useNewUrlParser: true,
@@ -21,13 +19,13 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 // eslint-disable-next-line no-console
 }).then(() => console.log('Connected to DS'));
 
-app.use(bodyParser.json()); // для собирания JSON-формата
+app.use(express.json()); // для собирания JSON-формата
 app.use(requestLogger);
 
 app.post('/signin', login);
 app.post('/signup', createUser);
 
-// app.use(auth);
+app.use(auth);
 
 app.use('/', usersRouter);
 app.use('/', cardsRouter);
@@ -36,6 +34,7 @@ app.use('/*', (req, res) => res.status(404).send({ message: 'Запрашива�
 app.use(errorLogger); // подключаем логгер ошибок
 // app.use(errors()); // обработчик ошибок celebrate
 
+// eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
   // если у ошибки нет статуса, выставляем 500
   const { statusCode = 500, message } = err;
