@@ -1,55 +1,68 @@
 /* eslint-disable linebreak-style */
 const bcrypt = require('bcryptjs');
 const User = require('../models/user');
+const NotFoundError = require('../errors/not-found-err');
+const BadRequest = require('../errors/bad-request');
 
 // Получить список всех юзеров
-const getUsers = (req, res) => User.find({})
-  .then((users) => res.status(200).send(users))
-  .catch(() => res.status(404).send({ message: 'Запрашиваемый файл не найден' }));
+const getUsers = (req, res, next) => User.find({})
+  .then((users) => {
+    if (!users) {
+      throw new NotFoundError('Запрашиваемый файл не найден');
+    }
+
+    res.status(200).send(users);
+  })
+  .catch(next);
 
 // Получить одного юзера по id
-const getUserProfile = (req, res) => User.findOne({ _id: req.params.id })
+const getUserProfile = (req, res, next) => User.findOne({ _id: req.params.id })
   .then((user) => {
     if (!user) {
-      return res.status(404).send({ message: 'Нет пользователя с таким id' });
+      throw new NotFoundError('Нет пользователя с таким id');
     }
-    return res.status(200).send(user);
+    res.status(200).send(user);
   })
-  .catch(((err) => {
-    if (err.name === 'CastError') {
-      return res.status(400).send({ message: 'Id юзера не валидный' });
-    }
-    return res.status(500).send(err);
-  }));
+  .catch(next);
 
 // Создать юзера
-const createUser = (req, res) => {
+const createUser = (req, res, next) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
   bcrypt.hash(password, 10).then((hash) => User.create({
     name, about, avatar, email, password: hash,
   }))
-    .then((user) => res.status(200).send(user))
-    .catch((err) => {
-      if (err.name === 'ValidationError' || err.name === 'CastError') {
-        return res.status(400).send({ message: 'Данные не прошли валидацию' });
+    .then((user) => {
+      if (!user) {
+        throw new BadRequest('Ошибка создания пользователя');
       }
-      return res.status(500).send(err);
-    });
+      res.status(200).send(user);
+    })
+    .catch(next);
 };
 
 // Обновить инфо юзера;
-const updateUserInfo = (req, res) => User.findByIdAndUpdate(req.user._id,
+const updateUserInfo = (req, res, next) => User.findByIdAndUpdate(req.user._id,
   { name: req.body.name, about: req.body.about }, { runValidators: true })
-  .then((user) => res.send({ data: user }))
-  .catch(() => res.status(400).send({ message: 'Ошибка при обновлении информации пользователя' }));
+  .then((user) => {
+    if (!user) {
+      throw new BadRequest('Ошибка при обновлении информации пользователя');
+    }
+    res.status(200).send({ data: user });
+  })
+  .catch(next);
 
 // Обновить аватар
-const updateAvatar = (req, res) => User.findByIdAndUpdate(req.user._id,
+const updateAvatar = (req, res, next) => User.findByIdAndUpdate(req.user._id,
   { avatar: req.body.avatar }, { runValidators: true })
-  .then((user) => res.send({ data: user }))
-  .catch(() => res.status(400).send({ message: 'Ошибка при обновлении аватара' }));
+  .then((user) => {
+    if (!user) {
+      throw new BadRequest('Ошибка при обновлении аватара');
+    }
+    res.status(200).send({ data: user });
+  })
+  .catch(next);
 
 module.exports = {
   getUsers, getUserProfile, createUser, updateUserInfo, updateAvatar,
