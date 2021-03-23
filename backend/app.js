@@ -9,7 +9,7 @@ const { requestLogger, errorLogger } = require('./middlewares/logger');
 const { createUser, login } = require('./controllers/users');
 const auth = require('./middlewares/auth');
 
-// const PORT = 3000;
+const PORT = 3000;
 const app = express();
 
 mongoose.connect('mongodb://localhost:27017/mestodb', {
@@ -64,7 +64,7 @@ app.use((err, req, res, next) => {
     });
 });
 
-// app.listen(PORT, () => (
-//   // eslint-disable-next-line no-console
-//   console.log(PORT)
-// ));
+app.listen(PORT, () => (
+  // eslint-disable-next-line no-console
+  console.log(PORT)
+));
