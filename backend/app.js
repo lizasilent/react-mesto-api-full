@@ -1,17 +1,17 @@
 /* eslint-disable linebreak-style */
 const express = require('express');
 
-const app = express();
-const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
+const { errors, celebrate, Joi } = require('celebrate');
 const usersRouter = require('./routes/users');
 const cardsRouter = require('./routes/cards');
-const login = require('./routes/login');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
+const { createUser, login } = require('./controllers/users');
+const NotFoundError = require('./errors/not-found-err');
 const auth = require('./middlewares/auth');
-const createUser = require('./routes/createUser');
 
 const PORT = 3000;
+const app = express();
 
 mongoose.connect('mongodb://localhost:27017/mestodb', {
   useNewUrlParser: true,
@@ -21,21 +21,51 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 // eslint-disable-next-line no-console
 }).then(() => console.log('Connected to DS'));
 
-app.use(bodyParser.json()); // для собирания JSON-формата
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', '*');
+  res.header('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS');
+  if (req.method === 'OPTIONS') {
+    res.send(200);
+  }
+  next();
+});
+app.use(express.json()); // для собирания JSON-формата
 app.use(requestLogger);
 
-app.post('/signin', login);
-app.post('/signup', createUser);
+app.get('/crash-test', () => {
+  setTimeout(() => {
+    throw new Error('Сервер сейчас упадёт');
+  }, 0);
+});
 
-// app.use(auth);
+app.post('/signin', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required().email(),
+    password: Joi.string().required(),
+  }),
+}), login);
 
+app.post('/signup', celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().min(8).max(30),
+    about: Joi.string().min(2).max(30),
+    avatar: Joi.string(),
+    email: Joi.string().required().email(),
+    password: Joi.string().required(),
+  }),
+}), createUser);
+
+app.use(auth);
 app.use('/', usersRouter);
 app.use('/', cardsRouter);
-app.use('/*', (req, res) => res.status(404).send({ message: 'Запрашиваемый ресурс не найден' }));
+app.use('/*', () => {
+  throw new NotFoundError('Запрашиваемый ресурс не найден');
+});
+app.use(errorLogger);
+app.use(errors());
 
-app.use(errorLogger); // подключаем логгер ошибок
-// app.use(errors()); // обработчик ошибок celebrate
-
+// eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
   // если у ошибки нет статуса, выставляем 500
   const { statusCode = 500, message } = err;

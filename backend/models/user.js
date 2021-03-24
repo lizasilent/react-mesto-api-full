@@ -1,17 +1,19 @@
 /* eslint-disable linebreak-style */
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
-// const validator = require('validator');
+const validator = require('validator');
 
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
+    required: true,
     minlength: 2,
     maxlength: 30,
     default: 'Жак-Ив Кусто',
   },
   about: {
     type: String,
+    required: true,
     minlength: 2,
     maxlength: 30,
     default: 'Исследователь',
@@ -30,9 +32,14 @@ const userSchema = new mongoose.Schema({
   },
   email: {
     type: String,
-    // validate: validator.isEmail(),
-    required: [true, 'Ошибки в ссылке нет'],
+    required: true,
     unique: true,
+    validate: {
+      validator(v) {
+        return validator.isEmail(v);
+      },
+    },
+
   },
   password: {
     type: String,
@@ -44,6 +51,7 @@ const userSchema = new mongoose.Schema({
 
 });
 
+// eslint-disable-next-line func-names
 userSchema.statics.findUserByCredentials = function (email, password) {
   return this.findOne({ email }).select('+password')
     .then((user) => {
