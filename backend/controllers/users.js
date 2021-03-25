@@ -7,16 +7,9 @@ const BadRequest = require('../errors/bad-request');
 const Unauthorized = require('../errors/unauthorized');
 const ForbiddenError = require('../errors/forbidden');
 const ConflictError = require('../errors/conflict-error');
+const isAuthorized = require('../helpers/checkAuth');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
-
-const isAuthorized = (token) => {
-  try {
-    return jwt.verify(token, JWT_SECRET);
-  } catch (err) {
-    return false;
-  }
-};
 
 // Получить информацию о себе
 const getMe = (req, res, next) => {
