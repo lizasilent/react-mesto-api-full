@@ -6,10 +6,13 @@ const NotFoundError = require('../errors/not-found-err');
 const BadRequest = require('../errors/bad-request');
 const Unauthorized = require('../errors/unauthorized');
 const ForbiddenError = require('../errors/forbidden');
+const ConflictError = require('../errors/conflict-error');
+
+const { NODE_ENV, JWT_SECRET } = process.env;
 
 const isAuthorized = (token) => {
   try {
-    return jwt.verify(token);
+    return jwt.verify(token, JWT_SECRET);
   } catch (err) {
     return false;
   }
@@ -20,7 +23,7 @@ const getMe = (req, res, next) => {
   const token = req.headers.authorization;
 
   if (!isAuthorized(token)) {
-    throw new ForbiddenError('Доступ запрещен');
+    throw new ForbiddenError('Ошибка токена');
   }
 
   return User.findById(req.user._id)
@@ -63,14 +66,18 @@ const createUser = (req, res, next) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
-  bcrypt.hash(password, 10).then((hash) => User.create({
-    name, about, avatar, email, password: hash,
-  }))
-    .then((user) => {
-      if (!user) {
-        throw new BadRequest('Ошибка создания пользователя');
+  bcrypt.hash(password, 10)
+    .then((hash) => User.create({
+      name, about, avatar, email, password: hash,
+    }))
+    .then((user) => res.status(200).send({ mail: user.email }))
+    .catch((err) => {
+      if (err.name === 'ValidationError' || err.name === 'CastError') {
+        throw new BadRequest(`Данные не прошли валидацию${err}`);
       }
-      res.status(200).send(user);
+      if (err.name === 'MongoError' || err.code === '11000') {
+        throw new ConflictError('Такой email уже зарегистрирован');
+      }
     })
     .catch(next);
 };
@@ -106,13 +113,12 @@ const login = (req, res, next) => {
 
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      if (!user) {
-        throw new Unauthorized('Ошибка авторизации');
-      }
-      // создадим токен
-      const token = jwt.sign({ _id: user._id }, { expiresIn: '7d' });
-      // вернём токен
-      res.status(200).send({ token });
+      const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret', { expiresIn: '7d' });
+
+      return res.send({ token });
+    })
+    .catch(() => {
+      throw new Unauthorized('Авторизация не пройдена');
     })
     .catch(next);
 };
