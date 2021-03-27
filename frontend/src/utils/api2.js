@@ -31,7 +31,6 @@ export const register = (email, password) => {
       return Promise.reject(`Ошибка: ${res.status}`);
   })
     .then((data) => {
-      console.log(data)
       if (data.token) {
         localStorage.setItem('jwt', data.token);
         return data.token;

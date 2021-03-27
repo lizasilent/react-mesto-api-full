@@ -23,7 +23,7 @@ this._headers = config.headers;
 
         
     getInitialCards() {
-      return this._fetch('/cards', 'GET')
+      return this._fetch('/cards', 'GET').then((result) => result.reverse())
     }
   
 
@@ -49,7 +49,6 @@ this._headers = config.headers;
         return this.removeCardLke(cardId)
     }
 }
-
 
   delCard(cardId) {
       return this._fetch(`/cards/${cardId}`, 'DELETE')

@@ -52,13 +52,16 @@ function App() {
 
     const handleLogin = (email, password) => {
       auth.authorize(email, password)
-      .then(() => {
+      .then(() => 
+      {
           setEmail(email);
           setLoggedIn(true);
-        history.push('/');
+          history.push('/');
         })
         .catch((err) => console.log(err));
+
     }
+
    
     const handleRegister = (email, password) => {
       auth.register(email, password)
@@ -95,11 +98,12 @@ function App() {
     }
 
   // Стейт, отвечающий за данные текущего пользователя
-  const [currentUser, setCurrentUser] = React.useState({ name: 'Gudetama', about: "lazylazy", avatar: "https://i.pinimg.com/originals/37/04/ef/3704efd795fcee0461946434db3c92c2.jpg" });
+  const [currentUser, setCurrentUser] = React.useState({})
 
     React.useEffect(() => {
-      api.getUserData().then((userData) => {
-        setCurrentUser(userData)
+      api.getUserData().then((user) => {
+        setCurrentUser(user.data);
+        console.log(currentUser);
       }).catch((err) => {
           console.log("Не загрузился юзер: " + err);
       });
@@ -135,6 +139,7 @@ function App() {
 
     // Обновление информации о текущем юзере
     function handleUpdateUser(values) {
+      console.log(values);
       api.patchUserData(values).then(userData => {
         setCurrentUser(userData);
         closeAllPopups();
@@ -177,6 +182,8 @@ function App() {
    
     function handleCardLike(card) {
       const isLiked = card.likes.some(i => i._id === currentUser._id);
+      console.log(card._id);
+      console.log(currentUser._id);
       api.changeLikeCardStatus(card._id, !isLiked).then((newCard) => {
         const newCards = cards.map((c) => c._id === card._id ? newCard : c);
         setCards(newCards);
