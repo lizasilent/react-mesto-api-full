@@ -73,15 +73,14 @@ this._headers = config.headers;
       }))
   }
 
- 
 }
 
 
 const api = new Api({
-baseUrl: "https://mesto.nomoreparties.co/v1/cohort-18",
+baseUrl: "http://localhost:3001",
 headers: {
-  authorization: "1b98b7f8-c29f-4d66-ae18-3d1d376d7ed7",
-  "Content-Type": "application/json"
+  "Content-Type": "application/json",
+  'Authorization': `${localStorage.getItem('jwt')}`
 }
 });
 
