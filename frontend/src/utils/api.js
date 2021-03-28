@@ -74,7 +74,7 @@ this._headers = config.headers;
 
 
 const api = new Api({
-baseUrl: "http://localhost:3001",
+baseUrl: "api.mesto.lizasilent.nomoredomains.icu",
 headers: {
   "Content-Type": "application/json",
   'Authorization': `${localStorage.getItem('jwt')}`
