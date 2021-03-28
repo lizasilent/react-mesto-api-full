@@ -16,7 +16,7 @@
   "bugs": {
     "url": "https://github.com/lizasilent/express-mesto/issues"
   },
-  "homepage": "./",
+  "homepage": "https://github.com/lizasilent/express-mesto#readme",
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
