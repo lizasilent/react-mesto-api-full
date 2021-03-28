@@ -5,7 +5,6 @@ this._headers = config.headers;
 
     }
 
-
     _fetch(url, method, body) {
         return fetch(this._baseUrl + url, {
             method: method,
