@@ -1,5 +1,5 @@
 class Api {
-    constructor(config){
+    constructor(config) {
 this._baseUrl = config.baseUrl;
 this._headers = config.headers;
 
@@ -20,7 +20,6 @@ this._headers = config.headers;
         })
     }
 
-        
     getInitialCards() {
       return this._fetch('/cards', 'GET').then((result) => result.reverse())
     }

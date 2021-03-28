@@ -72,7 +72,7 @@ const deleteLike = (req, res, next) => {
       if (!card) {
         throw new BadRequest('Id карточки не валидный');
       }
-      res.status(200).send(`Лайк на карточке удален ${card}`);
+      res.status(200).send(card);
     })
     .catch(next);
 };
