@@ -64,9 +64,9 @@ this._headers = config.headers;
       }))
   }
 
-  patchUserAvatar(values) {
+  patchUserAvatar(newAvatar) {
       return this._fetch('/users/me/avatar', 'PATCH', JSON.stringify({
-          avatar: values.avatar
+          avatar: newAvatar
       }))
   }
 
@@ -74,7 +74,7 @@ this._headers = config.headers;
 
 
 const api = new Api({
-baseUrl: "http://localhost:3000",
+baseUrl: "https://api.mesto.lizasilent.nomoredomains.icu",
 headers: {
   "Content-Type": "application/json",
   'Authorization': `${localStorage.getItem('jwt')}`

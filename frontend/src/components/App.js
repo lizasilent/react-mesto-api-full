@@ -100,9 +100,8 @@ function App() {
   const [currentUser, setCurrentUser] = React.useState({});
 
     React.useEffect(() => {
-      api.getUserData().then((user) => {
-        setCurrentUser(user.data);
-      }).catch((err) => {
+      api.getUserData().then((user) => setCurrentUser(user.data))
+      .catch((err) => {
           console.log("Не загрузился юзер: " + err);
       });
     }, []);
@@ -136,18 +135,23 @@ function App() {
 
 
     // Обновление информации о текущем юзере
-    function handleUpdateUser(values) {
-      api.patchUserData(values).then((user) => {
-        setCurrentUser(user.data);
+    function handleUpdateUser({name, about}) {
+      api.patchUserData({name, about}).then(() => {
+        const updatedUser = { ...currentUser };
+        console.log(updatedUser);
+        updatedUser.name = name;
+        updatedUser.about = about;
+        setCurrentUser({ ...updatedUser });
         closeAllPopups();
       }).catch((err) => {
           console.log("Не загрузить описание профиля: " + err);
       })
     } 
 
-    function handleUpdateAvatar(values) {
-      api.patchUserAvatar(values).then((user) => {
-        setCurrentUser(user.data);
+    function handleUpdateAvatar({avatar}) {
+      api.patchUserAvatar(avatar).then(
+        (updatedUser) => {
+        setCurrentUser(updatedUser.data);
         closeAllPopups();
       }).catch((err) => {
           console.log("Не загрузить аватар: " + err);
@@ -202,7 +206,7 @@ function App() {
           <div className="page__content">
               <Header loggedIn={loggedIn} email={email} handleLogout={handleLogout}/>
               <Switch>
-              {<ProtectedRoute exact path="/" loggedIn={loggedIn} component={Main}
+               <ProtectedRoute exact path="/" loggedIn={loggedIn} component={Main}
                     onEditProfile={handleEditProfileClick} 
                     onAddPlace={handleAddPlaceClick}
                     onEditAvatar={handleEditAvatarClick}
@@ -210,7 +214,7 @@ function App() {
                     cards={cards}
                     onCardLike={handleCardLike}
                     onCardDelete={handleCardDelete}
-                     />}
+                     />
 
     <Route path="/sign-in">
         <Login handleLogin={handleLogin} />
@@ -224,7 +228,7 @@ function App() {
           </Switch>
               <ImagePopup card={selectedCard} onClose={closeAllPopups} />
               <EditProfilePopup isOpen={isEditProfilePopupOpen} onClose={closeAllPopups} onUpdateUser={handleUpdateUser} />
-              <EditAvatarPopup isOpen={isEditAvatarPopupOpen} onClose={closeAllPopups} onUpdateAvatar={handleUpdateAvatar}/>
+               <EditAvatarPopup isOpen={isEditAvatarPopupOpen} onClose={closeAllPopups} onUpdateAvatar={handleUpdateAvatar}/>
               <AddPlacePopup isOpen={isAddPlacePopupOpen} onClose={closeAllPopups} onAddPlace={handleAddPlaceSubmit}/>
               <PopupWithForm name="type_submit" title="Вы уверены?" buttonTitle="Да"/>
               <InfoTooltip isOpen={isRegisterPopupOpen} onClose={closeAllPopups} message={message} />
