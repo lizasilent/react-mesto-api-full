@@ -11,4 +11,4 @@
 
 Посмотреть проект можно по ссылке: https://mesto.lizasilent.nomoredomains.icu/ 
 Апи https://api.mesto.lizasilent.nomoredomains.icu/ 
-Публичный ip 130.193.35.185 
+Публичный ip 84.201.170.231 

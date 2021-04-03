@@ -74,7 +74,7 @@ this._headers = config.headers;
 
 
 const api = new Api({
-baseUrl: "http://api.mesto.lizasilent.nomoredomains.icu",
+baseUrl: "https://api.mesto.lizasilent.nomoredomains.icu",
 headers: {
   "Content-Type": "application/json",
   'Authorization': `Bearer ${localStorage.getItem('jwt')}`
