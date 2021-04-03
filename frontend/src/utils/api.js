@@ -33,11 +33,11 @@ this._headers = config.headers;
   }
 
   takeCardLike(cardId) {
-      return this._fetch(`/cards/likes/${cardId}`, 'PUT')
+      return this._fetch(`/cards/${cardId}/likes`, 'PUT')
   }
 
   removeCardLke(cardId) {
-      return this._fetch(`/cards/likes/${cardId}`, 'DELETE')
+      return this._fetch(`/cards/${cardId}/likes`, 'DELETE')
   }
 
   changeLikeCardStatus(cardId, isLiked) {
@@ -74,10 +74,10 @@ this._headers = config.headers;
 
 
 const api = new Api({
-baseUrl: "https://api.mesto.lizasilent.nomoredomains.icu",
+baseUrl: "http://localhost:3000",
 headers: {
   "Content-Type": "application/json",
-  'Authorization': `${localStorage.getItem('jwt')}`
+  'Authorization': `Bearer ${localStorage.getItem('jwt')}`
 }
 });
 

@@ -11,7 +11,7 @@ const { createUser, login } = require('./controllers/users');
 const NotFoundError = require('./errors/not-found-err');
 const auth = require('./middlewares/auth');
 
-const { PORT = 3000 } = process.env;
+const { PORT = 3001 } = process.env;
 const app = express();
 
 mongoose.connect('mongodb://localhost:27017/mestodb', {
@@ -51,7 +51,7 @@ app.post('/signup', celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
-    avatar: Joi.string(),
+    avatar: Joi.string().pattern(/^https?:\/\/(www\.)?([a-zA-Z0-9-])+\.([a-zA-Z])+\/?([a-zA-Z0-9\-_~:/#[\]@!&â€™,;=]+)/),
     email: Joi.string().required().email(),
     password: Joi.string().required(),
   }),

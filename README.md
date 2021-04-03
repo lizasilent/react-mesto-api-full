@@ -12,5 +12,6 @@
 
 npm install и npm run start
 
-Посмотреть проект можно по ссылке: mesto.lizasilent.nomoredomains.icu 
+Посмотреть проект можно по ссылке: https://mesto.lizasilent.nomoredomains.icu/ 
+Апи https://api.mesto.lizasilent.nomoredomains.icu/ 
 Публичный ip 130.193.35.185 

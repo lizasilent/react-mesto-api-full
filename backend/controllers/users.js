@@ -1,23 +1,18 @@
 /* eslint-disable no-console */
 /* eslint-disable linebreak-style */
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const NotFoundError = require('../errors/not-found-err');
 const BadRequest = require('../errors/bad-request');
 const Unauthorized = require('../errors/unauthorized');
-const ForbiddenError = require('../errors/forbidden');
 const ConflictError = require('../errors/conflict-error');
-const { generateSign, isAuthorized } = require('../utils/jwt');
+
+const { NODE_ENV, JWT_SECRET } = process.env;
 
 // Получить информацию о себе
 const getMe = (req, res, next) => {
-  const token = req.headers.authorization;
-
-  if (!isAuthorized(token)) {
-    throw new ForbiddenError('Ошибка токена');
-  }
-
-  return User.findById(req.user._id)
+  User.findById(req.user._id)
     .then((user) => {
       if (!user) {
         throw new NotFoundError('Нет пользователя с таким id');
@@ -101,10 +96,15 @@ const updateAvatar = (req, res, next) => {
 
 const login = (req, res, next) => {
   const { email, password } = req.body;
+  console.log(req.headers);
 
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      const token = generateSign({ _id: user._id });
+      const token = jwt.sign(
+        { _id: user._id },
+        NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
+        { expiresIn: '7d' },
+      );
       return res.send({ token });
     })
     .catch(() => {

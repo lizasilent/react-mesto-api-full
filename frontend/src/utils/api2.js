@@ -1,4 +1,4 @@
-export const BASE_URL = 'https://api.mesto.lizasilent.nomoredomains.icu';
+export const BASE_URL = 'http://localhost:3000';
  
 export const register = (email, password) => {
     return fetch(`${BASE_URL}/signup`, {
@@ -43,7 +43,7 @@ export const getContent = (token) => {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `${token}`,
+      'Authorization': `Bearer ${token}`,
     }
   })
   .then(res => {
