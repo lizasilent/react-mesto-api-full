@@ -44,6 +44,11 @@ const getUserProfile = (req, res, next) => {
       }
       res.status(200).send(user);
     })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        throw new BadRequest('Id юзера не валидный');
+      }
+    })
     .catch(next);
 };
 

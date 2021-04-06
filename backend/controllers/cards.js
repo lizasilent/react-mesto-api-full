@@ -4,6 +4,7 @@
 const Card = require('../models/card');
 const NotFoundError = require('../errors/not-found-err');
 const BadRequest = require('../errors/bad-request');
+const Forbidden = require('../errors/forbidden');
 
 // Получить список всех карточек
 const getCards = (req, res, next) => {
@@ -38,9 +39,15 @@ const deleteCard = (req, res, next) => {
   Card.findOneAndRemove({ owner: req.user._id, _id: req.params.cardId })
     .then((card) => {
       if (!card) {
-        throw new BadRequest('Не удалось удалить карточку');
+        throw new Forbidden('Невозможно удалить карточку - ошибка доступа');
       }
       res.status(200).send({ message: 'Карточка удалена' });
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        throw new NotFoundError('Id карточки не валидный');
+      }
+      throw err;
     })
     .catch(next);
 };
@@ -54,7 +61,7 @@ const putLike = (req, res, next) => {
   )
     .then((card) => {
       if (!card) {
-        throw new BadRequest('Id карточки не валидный');
+        throw new NotFoundError('Id карточки не валидный');
       }
       res.status(200).send(card);
     })
@@ -70,7 +77,7 @@ const deleteLike = (req, res, next) => {
   )
     .then((card) => {
       if (!card) {
-        throw new BadRequest('Id карточки не валидный');
+        throw new NotFoundError('Id карточки не валидный');
       }
       res.status(200).send(card);
     })
