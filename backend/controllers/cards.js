@@ -36,20 +36,25 @@ const createCard = (req, res, next) => {
 
 // Удалить карточку
 const deleteCard = (req, res, next) => {
-  Card.findOneAndRemove({ owner: req.user._id, _id: req.params.cardId })
+  const owner = req.user._id;
+
+  Card.findById(req.params.cardId)
     .then((card) => {
       if (!card) {
+        throw new NotFoundError('Карточка не найдена');
+      }
+      if (card.owner.toString() !== owner) {
         throw new Forbidden('Невозможно удалить карточку - ошибка доступа');
       }
-      res.status(200).send({ message: 'Карточка удалена' });
+      Card.findOneAndRemove(req.params.cardId)
+        .then(() => res.status(200).send({ message: 'Карточка удалена' }));
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        throw new NotFoundError('Id карточки не валидный');
+        next(new NotFoundError('Id карточки не валидный'));
       }
-      throw err;
-    })
-    .catch(next);
+      next(err);
+    });
 };
 
 // Поставить карточке лайк

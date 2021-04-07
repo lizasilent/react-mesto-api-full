@@ -37,7 +37,7 @@ const getUsers = (req, res, next) => {
 
 // Получить одного юзера по id
 const getUserProfile = (req, res, next) => {
-  User.findOne({ _id: req.params.id })
+  User.findById(req.params.userId)
     .then((user) => {
       if (!user) {
         throw new NotFoundError('Нет пользователя с таким id');
@@ -46,10 +46,10 @@ const getUserProfile = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        throw new BadRequest('Id юзера не валидный');
+        next(new BadRequest('Данные не прошли валидацию'));
       }
-    })
-    .catch(next);
+      next(err);
+    });
 };
 
 // Создать юзера
