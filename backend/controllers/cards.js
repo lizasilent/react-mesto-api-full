@@ -38,7 +38,7 @@ const createCard = (req, res, next) => {
 const deleteCard = (req, res, next) => {
   const owner = req.user._id;
 
-  Card.findById(req.params.cardId)
+  Card.findByIdAndDelete(req.params.cardId)
     .then((card) => {
       if (!card) {
         throw new NotFoundError('Карточка не найдена');
